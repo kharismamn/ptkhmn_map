@@ -1,0 +1,39 @@
+name: Daily Google Maps Scraper
+
+on:
+  schedule:
+    # Berjalan pada 23:00 UTC (06:00 WIB) setiap Minggu-Jumat
+    # (Di WIB, ini berarti berjalan setiap Senin-Sabtu jam 06:00 Pagi)
+    - cron: '0 23 * * 0-5'
+  workflow_dispatch: # Memungkinkan Anda menekan tombol "Run" manual kapan saja
+
+jobs:
+  scrape-and-save:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Dibutuhkan untuk push otomatis file Excel
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Scraper Script
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: python scraper.py
+
+      - name: Commit and Push Data Excel
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          git add .
+          # Hanya commit jika ada perubahan (ada file xlsx baru / seen_places diupdate)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update data harian" && git push)
