@@ -7,7 +7,7 @@ from datetime import datetime
 
 BREVO_API_KEY = os.getenv('BREVO_API_KEY')
 SENDER_EMAIL = os.getenv('SENDER_EMAIL')  # Email pengirim yang terverifikasi di Brevo
-SENDER_NAME = os.getenv('SENDER_NAME', 'Tim Baja Jabodetabek')
+SENDER_NAME = os.getenv('SENDER_NAME', 'PT.Kharisma Mandiri Nusantara')
 RECIPIENTS_FILE = 'recipients.txt'
 
 def get_latest_excel():
@@ -74,11 +74,11 @@ def send_email_via_brevo():
         "to": to_list,
         "subject": f"Data Perusahaan Baja & Konstruksi Jabodetabek Terbaru - {today_str}",
         "htmlContent": f"""
-            <h2>Halo,</h2>
-            <p>Berikut kami kirimkan lampiran file Excel data terbaru <b>Perusahaan Baja &amp; Konstruksi di Jabodetabek</b> untuk hari ini ({today_str}).</p>
+            <h2>Hallo,</h2>
+            <p>Berikut kami kirimkan lampiran file Update Excel data terbaru <b>Perusahaan Baja &amp; Konstruksi di Jabodetabek</b> untuk hari ini ({today_str}).</p>
             <p>File terlampir dapat langsung diunduh dan dibuka menggunakan Microsoft Excel atau Google Sheets.</p>
             <br>
-            <p>Salam hangat,<br><b>{SENDER_NAME}</b></p>
+            <p>Salam hangat, Tim Automasi<br><b>{SENDER_NAME}</b></p>
         """,
         "attachment": [
             {
