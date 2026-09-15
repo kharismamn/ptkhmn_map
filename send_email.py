@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 import base64
 import requests
@@ -19,28 +20,34 @@ def get_latest_excel():
     return files[0]
 
 def load_recipients():
-    """Membaca daftar 100 email penerima dari file recipients.txt"""
+    """Membaca daftar email penerima dari file recipients.txt"""
     if not os.path.exists(RECIPIENTS_FILE):
         print(f"Error: File {RECIPIENTS_FILE} tidak ditemukan!")
         return []
     with open(RECIPIENTS_FILE, 'r') as f:
-        emails = [line.strip() for line in f if line.strip() and '@' in line]
+        emails = [
+            line.strip() for line in f 
+            if line.strip() and not line.strip().startswith('#') and '@' in line
+        ]
     return emails
 
 def send_email_via_brevo():
+    # 1. Validasi GitHub Secrets
     if not BREVO_API_KEY or not SENDER_EMAIL:
         print("Error: BREVO_API_KEY dan SENDER_EMAIL belum disetel di GitHub Secrets!")
-        return
+        sys.exit(1)
 
+    # 2. Validasi File Excel Lampiran
     excel_file = get_latest_excel()
     if not excel_file:
-        print("Error: Tidak ada file Excel yang ditemukan di repositori!")
-        return
+        print("Error: Tidak ada file Excel (Data_Baja_Konstruksi_*.xlsx) yang ditemukan di repositori!")
+        sys.exit(1)
 
+    # 3. Validasi Daftar Penerima
     recipients = load_recipients()
     if not recipients:
         print(f"Error: File {RECIPIENTS_FILE} kosong atau tidak ada email valid.")
-        return
+        sys.exit(1)
 
     print(f"Mempersiapkan pengiriman file '{excel_file}' ke {len(recipients)} konsumen via Brevo...")
 
@@ -68,7 +75,7 @@ def send_email_via_brevo():
         "subject": f"Data Perusahaan Baja & Konstruksi Jabodetabek Terbaru - {today_str}",
         "htmlContent": f"""
             <h2>Halo,</h2>
-            <p>Berikut kami kirimkan lampiran file Excel data terbaru <b>100 Perusahaan Baja &amp; Konstruksi di Jabodetabek</b> untuk hari ini ({today_str}).</p>
+            <p>Berikut kami kirimkan lampiran file Excel data terbaru <b>Perusahaan Baja &amp; Konstruksi di Jabodetabek</b> untuk hari ini ({today_str}).</p>
             <p>File terlampir dapat langsung diunduh dan dibuka menggunakan Microsoft Excel atau Google Sheets.</p>
             <br>
             <p>Salam hangat,<br><b>{SENDER_NAME}</b></p>
@@ -88,9 +95,11 @@ def send_email_via_brevo():
             print("Response Brevo:", response.json())
         else:
             print(f"GAGAL MENGIRIM! Status Code: {response.status_code}")
-            print("Detail Error:", response.text)
+            print("Detail Error dari Brevo:", response.text)
+            sys.exit(1)
     except Exception as e:
         print(f"Terjadi kesalahan koneksi ke Brevo API: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     send_email_via_brevo()
