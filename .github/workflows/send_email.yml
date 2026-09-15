@@ -2,6 +2,7 @@ name: Daily Email Sender
 
 on:
 schedule:
+# Berjalan jam 01:00 UTC = 08:00 WIB (Senin - Sabtu)
 - cron: '0 1 * * 1-6'
 workflow_dispatch:
 
