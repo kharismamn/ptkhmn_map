@@ -2,18 +2,15 @@ name: Daily Email Sender
 
 on:
 schedule:
-# Berjalan pada 01:00 UTC (Sama dengan 08:00 WIB Pagi)
-# Jadwal: Hari Senin sampai Sabtu (1-6)
 - cron: '0 1 * * 1-6'
-workflow_dispatch: # Tombol run manual
+workflow_dispatch:
 
 jobs:
 send-emails:
 runs-on: ubuntu-latest
-
 steps:
-  - name: Checkout repository
-    uses: actions/checkout@v3
+- name: Checkout repository
+uses: actions/checkout@v3
 
   - name: Setup Python
     uses: actions/setup-python@v4
