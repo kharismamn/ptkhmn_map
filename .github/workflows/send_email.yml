@@ -25,5 +25,5 @@ jobs:
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-          SENDER_NAME: "Tim Baja Jabodetabek"
+          SENDER_NAME: "PT.Kharisma Mandiri Nusantara"
         run: python send_email.py
